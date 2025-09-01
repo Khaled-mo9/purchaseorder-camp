@@ -1,0 +1,65 @@
+### 
+
+@baseUrl = http://localhost:40015
+
+### CRUD operations for header 
+
+#get headers
+
+GET {{baseUrl}}/odata/v4/purchaseService/purchaseorderheader HTTP/1.1
+
+### create new header
+
+POST {{baseUrl}}/odata/v4/purchaseService/purchaseorderheader HTTP/1.1
+Content-Type: application/json
+
+   {
+      "purchase_order_number": 4500000011,
+      "company_code": "2000",
+      "po_type": "NBB",
+      "vendor": "1000123",
+      "document_date": "2025-08-13",
+      "purchasing_org": "1000",
+      "purchasing_group": "001",
+      "currency": "USD"
+    }
+
+###
+
+DELETE {{baseUrl}}/odata/v4/purchaseService/purchaseorderheader/4500000011 HTTP/1.1
+
+### updata new header
+
+PUT {{baseUrl}}/odata/v4/purchaseService/purchaseorderheader/4500000012 HTTP/1.1
+Content-Type: application/json
+
+   {
+      "purchase_order_number": 4500000012,
+      "company_code": "5000",
+      "po_type": "NBB",
+      "vendor": "1000123",
+      "document_date": "2025-08-20",
+      "purchasing_org": "1000",
+      "purchasing_group": "001",
+      "currency": "USD"
+    }
+
+
+###  increment quantity
+
+POST {{baseUrl}}/odata/v4/increment-serv/increment HTTP/1.1
+Content-Type: application/json
+
+{"purchase_order_number": 4500000010}
+
+### increment quantity
+
+POST {{baseUrl}}/odata/v4/helperService/increment HTTP/1.1
+Content-Type: application/json
+
+{"purchase_order_number": 4500000010}
+
+### get totals items have the same po 
+
+GET {{baseUrl}}/odata/v4/helperService/totals(purchase_order_number=4500000010) HTTP/1.1
+

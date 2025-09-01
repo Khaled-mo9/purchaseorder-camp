@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+  </edmx:Reference>
+  <edmx:DataServices m:DataServiceVersion="2.0">
+    <Schema Namespace="helperSrv" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+      <Annotation Term="Core.Links" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Collection>
+          <Record>
+            <PropertyValue Property="rel" String="author"/>
+            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+          </Record>
+        </Collection>
+      </Annotation>
+      <EntityContainer Name="EntityContainer" m:IsDefaultEntityContainer="true">
+        <EntitySet Name="purchaseorderitems" EntityType="helperSrv.purchaseorderitems"/>
+        <FunctionImport Name="increment" ReturnType="helperSrv.return_helperSrv_increment" m:HttpMethod="POST">
+          <Parameter Name="purchase_order_number" Type="Edm.Int32" Mode="In" Nullable="true"/>
+        </FunctionImport>
+        <FunctionImport Name="totals" ReturnType="helperSrv.return_helperSrv_totals" m:HttpMethod="GET">
+          <Parameter Name="purchase_order_number" Type="Edm.Int32" Mode="In" Nullable="true"/>
+        </FunctionImport>
+      </EntityContainer>
+      <EntityType Name="purchaseorderitems">
+        <Key>
+          <PropertyRef Name="purchase_order_number"/>
+          <PropertyRef Name="po_item"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="purchase_order_number" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="po_item" Type="Edm.Int32" Nullable="false"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18"/>
+        <Property Name="quantity" Type="Edm.Decimal" Precision="13" Scale="3"/>
+        <Property Name="uom" Type="Edm.String" MaxLength="3"/>
+        <Property Name="net_price" Type="Edm.Decimal" Precision="11" Scale="2"/>
+        <Property Name="price_unit" Type="Edm.Int32"/>
+        <Property Name="delivery_completed" Type="Edm.Boolean"/>
+        <Property Name="delivery_date" Type="Edm.DateTime" sap:display-format="Date"/>
+      </EntityType>
+      <ComplexType Name="return_helperSrv_increment">
+        <Property Name="message" Type="Edm.String"/>
+        <Property Name="updatedQuantity" Type="Edm.Decimal" Precision="13" Scale="3"/>
+      </ComplexType>
+      <ComplexType Name="return_helperSrv_totals">
+        <Property Name="message" Type="Edm.String"/>
+        <Property Name="items" Type="Edm.String"/>
+      </ComplexType>
+      <Annotations Target="helperSrv.purchaseorderitems/createdAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/createdBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/modifiedAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/modifiedBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/purchase_order_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poNum}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/po_item" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poItem}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/material_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/quantity" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_quantity}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/uom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_uom}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/net_price" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_netPrice}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/price_unit" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_priceUnit}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/delivery_completed" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryCompleted}"/>
+      </Annotations>
+      <Annotations Target="helperSrv.purchaseorderitems/delivery_date" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryDate}"/>
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

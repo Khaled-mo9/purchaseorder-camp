@@ -1,0 +1,2313 @@
+{
+  "namespace": "khaled.customAspect",
+  "definitions": {
+    "khaled.customAspect.Lang": {
+      "kind": "type",
+      "type": "cds.String",
+      "length": 2,
+      "enum": {
+        "English": {
+          "val": "EN"
+        },
+        "Arabic": {
+          "val": "AR"
+        }
+      }
+    },
+    "khaled.db.Posts": {
+      "kind": "entity",
+      "includes": [
+        "cuid"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "userId": {
+          "type": "cds.Integer"
+        },
+        "title": {
+          "type": "cds.String"
+        },
+        "body": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "khaled.db.purchasecontext": {
+      "kind": "context"
+    },
+    "khaled.db.purchasecontext.purchaseorderheader": {
+      "kind": "entity",
+      "elements": {
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "company_code": {
+          "@title": "{i18n>bp_cCode}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "po_type": {
+          "@title": "{i18n>bp_poType}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "vendor": {
+          "@title": "{i18n>bp_vendor}",
+          "type": "cds.String",
+          "length": 10
+        },
+        "document_date": {
+          "@title": "{i18n>bp_docDate}",
+          "type": "cds.Date"
+        },
+        "purchasing_org": {
+          "@title": "{i18n>bp_purchOrg}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "purchasing_group": {
+          "@title": "{i18n>bp_purchGroup}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "currency": {
+          "@title": "{i18n>bp_currency}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "items": {
+          "@title": "{i18n>bp_items}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "khaled.db.purchasecontext.purchaseorderitems",
+          "on": [
+            {
+              "ref": [
+                "items",
+                "purchase_order_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "purchase_order_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "khaled.db.purchasecontext.purchaseorderitems": {
+      "kind": "entity",
+      "includes": [
+        "managed"
+      ],
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "quantity": {
+          "@title": "{i18n>bp_quantity}",
+          "type": "cds.Decimal",
+          "precision": 13,
+          "scale": 3
+        },
+        "uom": {
+          "@title": "{i18n>bp_uom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "net_price": {
+          "@title": "{i18n>bp_netPrice}",
+          "type": "cds.Decimal",
+          "precision": 11,
+          "scale": 2
+        },
+        "price_unit": {
+          "@title": "{i18n>bp_priceUnit}",
+          "type": "cds.Integer"
+        },
+        "delivery_completed": {
+          "@title": "{i18n>bp_deliveryCompleted}",
+          "type": "cds.Boolean"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "materials": {
+          "@title": "{i18n>bp_material}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "khaled.db.materialcontext.materialmaster",
+          "on": [
+            {
+              "ref": [
+                "materials",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "khaled.db.materialcontext": {
+      "kind": "context"
+    },
+    "khaled.db.materialcontext.materialmaster": {
+      "kind": "entity",
+      "elements": {
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "material_type": {
+          "@title": "{i18n>bp_materialType}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "industry_sector": {
+          "@title": "{i18n>bp_industrySector}",
+          "type": "cds.String",
+          "length": 1
+        },
+        "material_group": {
+          "@title": "{i18n>bp_materialGroup}",
+          "type": "cds.String",
+          "length": 9
+        },
+        "base_uom": {
+          "@title": "{i18n>bp_baseUom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "@title": "{i18n>bp_texts}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "khaled.db.materialcontext.materialdescription",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "texts",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "khaled.db.materialcontext.materialdescription": {
+      "kind": "entity",
+      "includes": [
+        "managed"
+      ],
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "language": {
+          "@title": "{i18n>bp_language}",
+          "key": true,
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 400
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "khaled.db.materialcontext.materialdescription.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "texts",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "language"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "khaled.db.materialcontext.materialdescription.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "language"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "khaled.db.viewAll": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "join": "inner",
+            "args": [
+              {
+                "join": "inner",
+                "args": [
+                  {
+                    "join": "inner",
+                    "args": [
+                      {
+                        "ref": [
+                          "khaled.db.purchasecontext.purchaseorderheader"
+                        ],
+                        "as": "a"
+                      },
+                      {
+                        "ref": [
+                          "khaled.db.purchasecontext.purchaseorderitems"
+                        ],
+                        "as": "b"
+                      }
+                    ],
+                    "on": [
+                      {
+                        "ref": [
+                          "a",
+                          "purchase_order_number"
+                        ]
+                      },
+                      "=",
+                      {
+                        "ref": [
+                          "b",
+                          "purchase_order_number"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "ref": [
+                      "khaled.db.materialcontext.materialmaster"
+                    ],
+                    "as": "c"
+                  }
+                ],
+                "on": [
+                  {
+                    "ref": [
+                      "b",
+                      "material_number"
+                    ]
+                  },
+                  "=",
+                  {
+                    "ref": [
+                      "c",
+                      "material_number"
+                    ]
+                  }
+                ]
+              },
+              {
+                "ref": [
+                  "khaled.db.materialcontext.materialdescription"
+                ],
+                "as": "d"
+              }
+            ],
+            "on": [
+              {
+                "ref": [
+                  "c",
+                  "material_number"
+                ]
+              },
+              "=",
+              {
+                "ref": [
+                  "d",
+                  "material_number"
+                ]
+              }
+            ]
+          },
+          "columns": [
+            {
+              "key": true,
+              "ref": [
+                "a",
+                "purchase_order_number"
+              ]
+            },
+            {
+              "ref": [
+                "b",
+                "po_item"
+              ]
+            },
+            {
+              "ref": [
+                "b",
+                "delivery_date"
+              ]
+            },
+            {
+              "ref": [
+                "c",
+                "material_number"
+              ]
+            },
+            {
+              "ref": [
+                "c",
+                "material_group"
+              ]
+            },
+            {
+              "ref": [
+                "d",
+                "language"
+              ]
+            },
+            {
+              "ref": [
+                "d",
+                "material_description"
+              ]
+            }
+          ]
+        }
+      },
+      "elements": {
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "type": "cds.Integer"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "material_group": {
+          "@title": "{i18n>bp_materialGroup}",
+          "type": "cds.String",
+          "length": 9
+        },
+        "language": {
+          "@title": "{i18n>bp_language}",
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 400
+        }
+      }
+    },
+    "cdsView": {
+      "@source": "srv/cdsView.cds",
+      "kind": "service",
+      "@path": "cdsView"
+    },
+    "cdsView.viewAll": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.viewAll"
+          ]
+        }
+      },
+      "elements": {
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "type": "cds.Integer"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "material_group": {
+          "@title": "{i18n>bp_materialGroup}",
+          "type": "cds.String",
+          "length": 9
+        },
+        "language": {
+          "@title": "{i18n>bp_language}",
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 400
+        }
+      }
+    },
+    "incrementServ": {
+      "@source": "srv/helper.cds",
+      "kind": "service"
+    },
+    "incrementServ.purchaseorderitems": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.purchasecontext.purchaseorderitems"
+          ]
+        }
+      },
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "quantity": {
+          "@title": "{i18n>bp_quantity}",
+          "type": "cds.Decimal",
+          "precision": 13,
+          "scale": 3
+        },
+        "uom": {
+          "@title": "{i18n>bp_uom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "net_price": {
+          "@title": "{i18n>bp_netPrice}",
+          "type": "cds.Decimal",
+          "precision": 11,
+          "scale": 2
+        },
+        "price_unit": {
+          "@title": "{i18n>bp_priceUnit}",
+          "type": "cds.Integer"
+        },
+        "delivery_completed": {
+          "@title": "{i18n>bp_deliveryCompleted}",
+          "type": "cds.Boolean"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "materials": {
+          "@title": "{i18n>bp_material}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "khaled.db.materialcontext.materialmaster",
+          "on": [
+            {
+              "ref": [
+                "materials",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "incrementServ.increment": {
+      "kind": "action",
+      "params": {
+        "purchase_order_number": {
+          "type": "cds.Integer"
+        }
+      },
+      "returns": {
+        "elements": {
+          "message": {
+            "type": "cds.String"
+          },
+          "updatedQuantity": {
+            "type": "cds.Decimal",
+            "precision": 13,
+            "scale": 3
+          }
+        }
+      }
+    },
+    "purchaseServ": {
+      "@source": "srv/puchaseSrv.cds",
+      "kind": "service",
+      "@path": "purchaseService"
+    },
+    "purchaseServ.purchaseorderheader": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.purchasecontext.purchaseorderheader"
+          ]
+        }
+      },
+      "elements": {
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "company_code": {
+          "@title": "{i18n>bp_cCode}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "po_type": {
+          "@title": "{i18n>bp_poType}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "vendor": {
+          "@title": "{i18n>bp_vendor}",
+          "type": "cds.String",
+          "length": 10
+        },
+        "document_date": {
+          "@title": "{i18n>bp_docDate}",
+          "type": "cds.Date"
+        },
+        "purchasing_org": {
+          "@title": "{i18n>bp_purchOrg}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "purchasing_group": {
+          "@title": "{i18n>bp_purchGroup}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "currency": {
+          "@title": "{i18n>bp_currency}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "items": {
+          "@title": "{i18n>bp_items}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "purchaseServ.purchaseorderitems",
+          "on": [
+            {
+              "ref": [
+                "items",
+                "purchase_order_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "purchase_order_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "purchaseServ.purchaseorderitems": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.purchasecontext.purchaseorderitems"
+          ]
+        }
+      },
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "quantity": {
+          "@title": "{i18n>bp_quantity}",
+          "type": "cds.Decimal",
+          "precision": 13,
+          "scale": 3
+        },
+        "uom": {
+          "@title": "{i18n>bp_uom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "net_price": {
+          "@title": "{i18n>bp_netPrice}",
+          "type": "cds.Decimal",
+          "precision": 11,
+          "scale": 2
+        },
+        "price_unit": {
+          "@title": "{i18n>bp_priceUnit}",
+          "type": "cds.Integer"
+        },
+        "delivery_completed": {
+          "@title": "{i18n>bp_deliveryCompleted}",
+          "type": "cds.Boolean"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "materials": {
+          "@title": "{i18n>bp_material}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "purchaseServ.materialmaster",
+          "on": [
+            {
+              "ref": [
+                "materials",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "purchaseServ.materialmaster": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.materialcontext.materialmaster"
+          ]
+        }
+      },
+      "elements": {
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "material_type": {
+          "@title": "{i18n>bp_materialType}",
+          "type": "cds.String",
+          "length": 4
+        },
+        "industry_sector": {
+          "@title": "{i18n>bp_industrySector}",
+          "type": "cds.String",
+          "length": 1
+        },
+        "material_group": {
+          "@title": "{i18n>bp_materialGroup}",
+          "type": "cds.String",
+          "length": 9
+        },
+        "base_uom": {
+          "@title": "{i18n>bp_baseUom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "@title": "{i18n>bp_texts}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "purchaseServ.materialdescription",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "texts",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "purchaseServ.materialdescription": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.materialcontext.materialdescription"
+          ]
+        }
+      },
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "language": {
+          "@title": "{i18n>bp_language}",
+          "key": true,
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 400
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "purchaseServ.materialdescription.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "texts",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "language"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "purchaseServ.materialdescription.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "language"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "language"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "helperSrv": {
+      "@source": "srv/puchaseSrv.cds",
+      "kind": "service",
+      "@impl": "./helper.js",
+      "@path": "helperService"
+    },
+    "helperSrv.purchaseorderitems": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.purchasecontext.purchaseorderitems"
+          ]
+        }
+      },
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "purchase_order_number": {
+          "@title": "{i18n>bp_poNum}",
+          "key": true,
+          "type": "cds.Integer64"
+        },
+        "po_item": {
+          "@title": "{i18n>bp_poItem}",
+          "key": true,
+          "type": "cds.Integer"
+        },
+        "material_number": {
+          "@title": "{i18n>bp_materialNum}",
+          "type": "cds.String",
+          "length": 18
+        },
+        "quantity": {
+          "@title": "{i18n>bp_quantity}",
+          "type": "cds.Decimal",
+          "precision": 13,
+          "scale": 3
+        },
+        "uom": {
+          "@title": "{i18n>bp_uom}",
+          "type": "cds.String",
+          "length": 3
+        },
+        "net_price": {
+          "@title": "{i18n>bp_netPrice}",
+          "type": "cds.Decimal",
+          "precision": 11,
+          "scale": 2
+        },
+        "price_unit": {
+          "@title": "{i18n>bp_priceUnit}",
+          "type": "cds.Integer"
+        },
+        "delivery_completed": {
+          "@title": "{i18n>bp_deliveryCompleted}",
+          "type": "cds.Boolean"
+        },
+        "delivery_date": {
+          "@title": "{i18n>bp_deliveryDate}",
+          "type": "cds.Date"
+        },
+        "materials": {
+          "@title": "{i18n>bp_material}",
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "khaled.db.materialcontext.materialmaster",
+          "on": [
+            {
+              "ref": [
+                "materials",
+                "material_number"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "material_number"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "helperSrv.increment": {
+      "kind": "action",
+      "params": {
+        "purchase_order_number": {
+          "type": "cds.Integer"
+        }
+      },
+      "returns": {
+        "elements": {
+          "message": {
+            "type": "cds.String"
+          },
+          "updatedQuantity": {
+            "type": "cds.Decimal",
+            "precision": 13,
+            "scale": 3
+          }
+        }
+      }
+    },
+    "helperSrv.totals": {
+      "kind": "function",
+      "params": {
+        "purchase_order_number": {
+          "type": "cds.Integer"
+        }
+      },
+      "returns": {
+        "elements": {
+          "message": {
+            "type": "cds.String"
+          },
+          "items": {
+            "type": "cds.String"
+          }
+        }
+      }
+    },
+    "PostServ": {
+      "@source": "srv/srv1.cds",
+      "kind": "service"
+    },
+    "PostServ.Posts": {
+      "kind": "entity",
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.Posts"
+          ]
+        }
+      },
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "userId": {
+          "type": "cds.Integer"
+        },
+        "title": {
+          "type": "cds.String"
+        },
+        "body": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "cds.outbox.Messages": {
+      "kind": "entity",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        },
+        "target": {
+          "type": "cds.String"
+        },
+        "msg": {
+          "type": "cds.LargeString"
+        },
+        "attempts": {
+          "type": "cds.Integer",
+          "default": {
+            "val": 0
+          }
+        },
+        "partition": {
+          "type": "cds.Integer",
+          "default": {
+            "val": 0
+          }
+        },
+        "lastError": {
+          "type": "cds.LargeString"
+        },
+        "lastAttemptTimestamp": {
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "type": "cds.Timestamp"
+        },
+        "status": {
+          "type": "cds.String",
+          "length": 23
+        }
+      }
+    },
+    "Language": {
+      "kind": "type",
+      "@title": "{i18n>Language}",
+      "@description": "{i18n>LanguageCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Languages",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Currency": {
+      "kind": "type",
+      "@title": "{i18n>Currency}",
+      "@description": "{i18n>CurrencyCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Currencies",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Country": {
+      "kind": "type",
+      "@title": "{i18n>Country}",
+      "@description": "{i18n>CountryCode.Description}",
+      "type": "cds.Association",
+      "target": "sap.common.Countries",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Timezone": {
+      "kind": "type",
+      "type": "cds.Association",
+      "target": "sap.common.Timezones",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "sap.common": {
+      "kind": "context"
+    },
+    "sap.common.Locale": {
+      "kind": "type",
+      "@title": "{i18n>LanguageCode}",
+      "type": "cds.String",
+      "length": 14
+    },
+    "sap.common.Languages": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@Common.Text": {
+            "=": "name"
+          },
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Languages.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Languages.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Countries": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CountryCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Countries.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Countries.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Currencies": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CurrencyCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "symbol": {
+          "@title": "{i18n>CurrencySymbol}",
+          "type": "cds.String",
+          "length": 5
+        },
+        "minorUnit": {
+          "@title": "{i18n>CurrencyMinorUnit}",
+          "type": "cds.Int16"
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Currencies.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Currencies.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Timezones": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>TimeZoneCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 100
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Timezones.texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Timezones.texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.CodeList": {
+      "kind": "aspect",
+      "@cds.autoexpose": true,
+      "@cds.persistence.skip": "if-unused",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.odata.valuelist": true,
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        }
+      }
+    },
+    "sap.common.TextsAspect": {
+      "kind": "aspect",
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        }
+      }
+    },
+    "cuid": {
+      "kind": "aspect",
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        }
+      }
+    },
+    "managed": {
+      "kind": "aspect",
+      "elements": {
+        "createdAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@Core.Immutable": true,
+          "@title": "{i18n>CreatedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedAt}",
+          "@readonly": true,
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@UI.HiddenFilter": true,
+          "@UI.ExcludeFromNavigationContext": true,
+          "@title": "{i18n>ChangedBy}",
+          "@readonly": true,
+          "@description": "{i18n>UserID.Description}",
+          "type": "User",
+          "length": 255
+        }
+      }
+    },
+    "temporal": {
+      "kind": "aspect",
+      "elements": {
+        "validFrom": {
+          "@cds.valid.from": true,
+          "type": "cds.Timestamp"
+        },
+        "validTo": {
+          "@cds.valid.to": true,
+          "type": "cds.Timestamp"
+        }
+      }
+    },
+    "User": {
+      "kind": "type",
+      "@title": "{i18n>UserID}",
+      "@description": "{i18n>UserID.Description}",
+      "type": "cds.String",
+      "length": 255
+    },
+    "khaled.db.materialcontext.materialdescription.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "material_number": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "language": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>bp_language}",
+          "key": true,
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 400
+        }
+      }
+    },
+    "sap.common.Languages.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@Common.Text": {
+            "=": "name"
+          },
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        }
+      }
+    },
+    "sap.common.Countries.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CountryCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Currencies.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CurrencyCode}",
+          "@Common.Text": {
+            "=": "name"
+          },
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Timezones.texts": {
+      "kind": "entity",
+      "@odata.draft.enabled": false,
+      "includes": [
+        "sap.common.TextsAspect"
+      ],
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>TimeZoneCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 100
+        }
+      }
+    },
+    "purchaseServ.materialdescription.texts": {
+      "kind": "entity",
+      "@cds.autoexposed": true,
+      "@odata.draft.enabled": false,
+      "projection": {
+        "from": {
+          "ref": [
+            "khaled.db.materialcontext.materialdescription.texts"
+          ]
+        }
+      },
+      "elements": {
+        "locale": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "sap.common.Locale",
+          "length": 14
+        },
+        "material_number": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>bp_materialNum}",
+          "key": true,
+          "type": "cds.String",
+          "length": 18
+        },
+        "language": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>bp_language}",
+          "key": true,
+          "type": "khaled.customAspect.Lang",
+          "length": 2
+        },
+        "material_description": {
+          "@title": "{i18n>bp_materialDesc}",
+          "localized": null,
+          "type": "cds.String",
+          "length": 400
+        }
+      }
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v6.2.2",
+    "flavor": "inferred"
+  },
+  "$version": "2.0"
+}

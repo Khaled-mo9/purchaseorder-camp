@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+    <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+    <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Validation.V1.xml">
+    <edmx:Include Alias="Validation" Namespace="Org.OData.Validation.V1"/>
+  </edmx:Reference>
+  <edmx:DataServices>
+    <Schema Namespace="purchaseServ" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+      <Annotation Term="Core.Links">
+        <Collection>
+          <Record>
+            <PropertyValue Property="rel" String="author"/>
+            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+          </Record>
+        </Collection>
+      </Annotation>
+      <EntityContainer Name="EntityContainer">
+        <EntitySet Name="purchaseorderheader" EntityType="purchaseServ.purchaseorderheader">
+          <NavigationPropertyBinding Path="items" Target="purchaseorderitems"/>
+        </EntitySet>
+        <EntitySet Name="purchaseorderitems" EntityType="purchaseServ.purchaseorderitems">
+          <NavigationPropertyBinding Path="materials" Target="materialmaster"/>
+        </EntitySet>
+        <EntitySet Name="materialmaster" EntityType="purchaseServ.materialmaster">
+          <NavigationPropertyBinding Path="texts" Target="materialdescription"/>
+        </EntitySet>
+        <EntitySet Name="materialdescription" EntityType="purchaseServ.materialdescription">
+          <NavigationPropertyBinding Path="texts" Target="materialdescription_texts"/>
+          <NavigationPropertyBinding Path="localized" Target="materialdescription_texts"/>
+        </EntitySet>
+        <EntitySet Name="materialdescription_texts" EntityType="purchaseServ.materialdescription_texts"/>
+      </EntityContainer>
+      <EntityType Name="purchaseorderheader">
+        <Key>
+          <PropertyRef Name="purchase_order_number"/>
+        </Key>
+        <Property Name="purchase_order_number" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="company_code" Type="Edm.String" MaxLength="4"/>
+        <Property Name="po_type" Type="Edm.String" MaxLength="4"/>
+        <Property Name="vendor" Type="Edm.String" MaxLength="10"/>
+        <Property Name="document_date" Type="Edm.Date"/>
+        <Property Name="purchasing_org" Type="Edm.String" MaxLength="4"/>
+        <Property Name="purchasing_group" Type="Edm.String" MaxLength="3"/>
+        <Property Name="currency" Type="Edm.String" MaxLength="3"/>
+        <NavigationProperty Name="items" Type="Collection(purchaseServ.purchaseorderitems)"/>
+      </EntityType>
+      <EntityType Name="purchaseorderitems">
+        <Key>
+          <PropertyRef Name="purchase_order_number"/>
+          <PropertyRef Name="po_item"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="purchase_order_number" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="po_item" Type="Edm.Int32" Nullable="false"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18"/>
+        <Property Name="quantity" Type="Edm.Decimal" Precision="13" Scale="3"/>
+        <Property Name="uom" Type="Edm.String" MaxLength="3"/>
+        <Property Name="net_price" Type="Edm.Decimal" Precision="11" Scale="2"/>
+        <Property Name="price_unit" Type="Edm.Int32"/>
+        <Property Name="delivery_completed" Type="Edm.Boolean"/>
+        <Property Name="delivery_date" Type="Edm.Date"/>
+        <NavigationProperty Name="materials" Type="purchaseServ.materialmaster">
+          <ReferentialConstraint Property="material_number" ReferencedProperty="material_number"/>
+        </NavigationProperty>
+      </EntityType>
+      <EntityType Name="materialmaster">
+        <Key>
+          <PropertyRef Name="material_number"/>
+        </Key>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="material_type" Type="Edm.String" MaxLength="4"/>
+        <Property Name="industry_sector" Type="Edm.String" MaxLength="1"/>
+        <Property Name="material_group" Type="Edm.String" MaxLength="9"/>
+        <Property Name="base_uom" Type="Edm.String" MaxLength="3"/>
+        <NavigationProperty Name="texts" Type="Collection(purchaseServ.materialdescription)"/>
+      </EntityType>
+      <EntityType Name="materialdescription">
+        <Key>
+          <PropertyRef Name="material_number"/>
+          <PropertyRef Name="language"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="language" Type="Edm.String" MaxLength="2" Nullable="false"/>
+        <Property Name="material_description" Type="Edm.String" MaxLength="400"/>
+        <NavigationProperty Name="texts" Type="Collection(purchaseServ.materialdescription_texts)">
+          <OnDelete Action="Cascade"/>
+        </NavigationProperty>
+        <NavigationProperty Name="localized" Type="purchaseServ.materialdescription_texts">
+          <ReferentialConstraint Property="material_number" ReferencedProperty="material_number"/>
+          <ReferentialConstraint Property="language" ReferencedProperty="language"/>
+        </NavigationProperty>
+      </EntityType>
+      <EntityType Name="materialdescription_texts">
+        <Key>
+          <PropertyRef Name="locale"/>
+          <PropertyRef Name="material_number"/>
+          <PropertyRef Name="language"/>
+        </Key>
+        <Property Name="locale" Type="Edm.String" MaxLength="14" Nullable="false"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="language" Type="Edm.String" MaxLength="2" Nullable="false"/>
+        <Property Name="material_description" Type="Edm.String" MaxLength="400"/>
+      </EntityType>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchase_order_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_poNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/company_code">
+        <Annotation Term="Common.Label" String="{i18n>bp_cCode}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/po_type">
+        <Annotation Term="Common.Label" String="{i18n>bp_poType}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/vendor">
+        <Annotation Term="Common.Label" String="{i18n>bp_vendor}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/document_date">
+        <Annotation Term="Common.Label" String="{i18n>bp_docDate}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchasing_org">
+        <Annotation Term="Common.Label" String="{i18n>bp_purchOrg}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchasing_group">
+        <Annotation Term="Common.Label" String="{i18n>bp_purchGroup}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/currency">
+        <Annotation Term="Common.Label" String="{i18n>bp_currency}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/items">
+        <Annotation Term="Common.Label" String="{i18n>bp_items}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/createdAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/createdBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/modifiedAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/modifiedBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/purchase_order_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_poNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/po_item">
+        <Annotation Term="Common.Label" String="{i18n>bp_poItem}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/material_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/quantity">
+        <Annotation Term="Common.Label" String="{i18n>bp_quantity}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/uom">
+        <Annotation Term="Common.Label" String="{i18n>bp_uom}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/net_price">
+        <Annotation Term="Common.Label" String="{i18n>bp_netPrice}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/price_unit">
+        <Annotation Term="Common.Label" String="{i18n>bp_priceUnit}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/delivery_completed">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryCompleted}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/delivery_date">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryDate}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/materials">
+        <Annotation Term="Common.Label" String="{i18n>bp_material}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_type">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialType}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/industry_sector">
+        <Annotation Term="Common.Label" String="{i18n>bp_industrySector}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_group">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialGroup}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/base_uom">
+        <Annotation Term="Common.Label" String="{i18n>bp_baseUom}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/texts">
+        <Annotation Term="Common.Label" String="{i18n>bp_texts}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/createdAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/createdBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/modifiedAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/modifiedBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/material_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/language">
+        <Annotation Term="Common.Label" String="{i18n>bp_language}"/>
+        <Annotation Term="Validation.AllowedValues">
+          <Collection>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="English"/>
+              <PropertyValue Property="Value" String="EN"/>
+            </Record>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="Arabic"/>
+              <PropertyValue Property="Value" String="AR"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/material_description">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialDesc}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/locale">
+        <Annotation Term="Common.Label" String="{i18n>LanguageCode}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/material_number">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/language">
+        <Annotation Term="Common.Label" String="{i18n>bp_language}"/>
+        <Annotation Term="Validation.AllowedValues">
+          <Collection>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="English"/>
+              <PropertyValue Property="Value" String="EN"/>
+            </Record>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="Arabic"/>
+              <PropertyValue Property="Value" String="AR"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/material_description">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialDesc}"/>
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

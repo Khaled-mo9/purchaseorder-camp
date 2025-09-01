@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Validation.V1.xml" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Include Alias="Validation" Namespace="Org.OData.Validation.V1"/>
+  </edmx:Reference>
+  <edmx:DataServices m:DataServiceVersion="2.0">
+    <Schema Namespace="purchaseServ" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+      <Annotation Term="Core.Links" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Collection>
+          <Record>
+            <PropertyValue Property="rel" String="author"/>
+            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+          </Record>
+        </Collection>
+      </Annotation>
+      <EntityContainer Name="EntityContainer" m:IsDefaultEntityContainer="true">
+        <EntitySet Name="purchaseorderheader" EntityType="purchaseServ.purchaseorderheader"/>
+        <EntitySet Name="purchaseorderitems" EntityType="purchaseServ.purchaseorderitems"/>
+        <EntitySet Name="materialmaster" EntityType="purchaseServ.materialmaster"/>
+        <EntitySet Name="materialdescription" EntityType="purchaseServ.materialdescription"/>
+        <EntitySet Name="materialdescription_texts" EntityType="purchaseServ.materialdescription_texts"/>
+        <AssociationSet Name="purchaseorderheader_items" Association="purchaseServ.purchaseorderheader_items">
+          <End Role="purchaseorderheader" EntitySet="purchaseorderheader"/>
+          <End Role="purchaseorderitems" EntitySet="purchaseorderitems"/>
+        </AssociationSet>
+        <AssociationSet Name="purchaseorderitems_materials" Association="purchaseServ.purchaseorderitems_materials">
+          <End Role="purchaseorderitems" EntitySet="purchaseorderitems"/>
+          <End Role="materialmaster" EntitySet="materialmaster"/>
+        </AssociationSet>
+        <AssociationSet Name="materialmaster_texts" Association="purchaseServ.materialmaster_texts">
+          <End Role="materialmaster" EntitySet="materialmaster"/>
+          <End Role="materialdescription" EntitySet="materialdescription"/>
+        </AssociationSet>
+        <AssociationSet Name="materialdescription_texts_1" Association="purchaseServ.materialdescription_texts_1">
+          <End Role="materialdescription" EntitySet="materialdescription"/>
+          <End Role="materialdescription_texts" EntitySet="materialdescription_texts"/>
+        </AssociationSet>
+        <AssociationSet Name="materialdescription_localized" Association="purchaseServ.materialdescription_localized">
+          <End Role="materialdescription" EntitySet="materialdescription"/>
+          <End Role="materialdescription_texts" EntitySet="materialdescription_texts"/>
+        </AssociationSet>
+      </EntityContainer>
+      <EntityType Name="purchaseorderheader">
+        <Key>
+          <PropertyRef Name="purchase_order_number"/>
+        </Key>
+        <Property Name="purchase_order_number" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="company_code" Type="Edm.String" MaxLength="4"/>
+        <Property Name="po_type" Type="Edm.String" MaxLength="4"/>
+        <Property Name="vendor" Type="Edm.String" MaxLength="10"/>
+        <Property Name="document_date" Type="Edm.DateTime" sap:display-format="Date"/>
+        <Property Name="purchasing_org" Type="Edm.String" MaxLength="4"/>
+        <Property Name="purchasing_group" Type="Edm.String" MaxLength="3"/>
+        <Property Name="currency" Type="Edm.String" MaxLength="3"/>
+        <NavigationProperty Name="items" Relationship="purchaseServ.purchaseorderheader_items" FromRole="purchaseorderheader" ToRole="purchaseorderitems"/>
+      </EntityType>
+      <EntityType Name="purchaseorderitems">
+        <Key>
+          <PropertyRef Name="purchase_order_number"/>
+          <PropertyRef Name="po_item"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="purchase_order_number" Type="Edm.Int64" Nullable="false"/>
+        <Property Name="po_item" Type="Edm.Int32" Nullable="false"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18"/>
+        <Property Name="quantity" Type="Edm.Decimal" Precision="13" Scale="3"/>
+        <Property Name="uom" Type="Edm.String" MaxLength="3"/>
+        <Property Name="net_price" Type="Edm.Decimal" Precision="11" Scale="2"/>
+        <Property Name="price_unit" Type="Edm.Int32"/>
+        <Property Name="delivery_completed" Type="Edm.Boolean"/>
+        <Property Name="delivery_date" Type="Edm.DateTime" sap:display-format="Date"/>
+        <NavigationProperty Name="materials" Relationship="purchaseServ.purchaseorderitems_materials" FromRole="purchaseorderitems" ToRole="materialmaster"/>
+      </EntityType>
+      <EntityType Name="materialmaster">
+        <Key>
+          <PropertyRef Name="material_number"/>
+        </Key>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="material_type" Type="Edm.String" MaxLength="4"/>
+        <Property Name="industry_sector" Type="Edm.String" MaxLength="1"/>
+        <Property Name="material_group" Type="Edm.String" MaxLength="9"/>
+        <Property Name="base_uom" Type="Edm.String" MaxLength="3"/>
+        <NavigationProperty Name="texts" Relationship="purchaseServ.materialmaster_texts" FromRole="materialmaster" ToRole="materialdescription"/>
+      </EntityType>
+      <EntityType Name="materialdescription">
+        <Key>
+          <PropertyRef Name="material_number"/>
+          <PropertyRef Name="language"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="language" Type="Edm.String" MaxLength="2" Nullable="false"/>
+        <Property Name="material_description" Type="Edm.String" MaxLength="400"/>
+        <NavigationProperty Name="texts" Relationship="purchaseServ.materialdescription_texts_1" FromRole="materialdescription" ToRole="materialdescription_texts"/>
+        <NavigationProperty Name="localized" Relationship="purchaseServ.materialdescription_localized" FromRole="materialdescription" ToRole="materialdescription_texts"/>
+      </EntityType>
+      <EntityType Name="materialdescription_texts">
+        <Key>
+          <PropertyRef Name="locale"/>
+          <PropertyRef Name="material_number"/>
+          <PropertyRef Name="language"/>
+        </Key>
+        <Property Name="locale" Type="Edm.String" MaxLength="14" Nullable="false"/>
+        <Property Name="material_number" Type="Edm.String" MaxLength="18" Nullable="false"/>
+        <Property Name="language" Type="Edm.String" MaxLength="2" Nullable="false"/>
+        <Property Name="material_description" Type="Edm.String" MaxLength="400"/>
+      </EntityType>
+      <Association Name="purchaseorderheader_items">
+        <End Role="purchaseorderheader" Type="purchaseServ.purchaseorderheader" Multiplicity="*"/>
+        <End Role="purchaseorderitems" Type="purchaseServ.purchaseorderitems" Multiplicity="*"/>
+      </Association>
+      <Association Name="purchaseorderitems_materials">
+        <End Role="purchaseorderitems" Type="purchaseServ.purchaseorderitems" Multiplicity="*"/>
+        <End Role="materialmaster" Type="purchaseServ.materialmaster" Multiplicity="0..1"/>
+        <ReferentialConstraint>
+          <Principal Role="materialmaster">
+            <PropertyRef Name="material_number"/>
+          </Principal>
+          <Dependent Role="purchaseorderitems">
+            <PropertyRef Name="material_number"/>
+          </Dependent>
+        </ReferentialConstraint>
+      </Association>
+      <Association Name="materialmaster_texts">
+        <End Role="materialmaster" Type="purchaseServ.materialmaster" Multiplicity="*"/>
+        <End Role="materialdescription" Type="purchaseServ.materialdescription" Multiplicity="*"/>
+      </Association>
+      <Association Name="materialdescription_texts_1">
+        <End Role="materialdescription" Type="purchaseServ.materialdescription" Multiplicity="1">
+          <OnDelete Action="Cascade"/>
+        </End>
+        <End Role="materialdescription_texts" Type="purchaseServ.materialdescription_texts" Multiplicity="*"/>
+      </Association>
+      <Association Name="materialdescription_localized">
+        <End Role="materialdescription" Type="purchaseServ.materialdescription" Multiplicity="*"/>
+        <End Role="materialdescription_texts" Type="purchaseServ.materialdescription_texts" Multiplicity="0..1"/>
+      </Association>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchase_order_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/company_code" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_cCode}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/po_type" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poType}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/vendor" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_vendor}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/document_date" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_docDate}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchasing_org" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_purchOrg}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/purchasing_group" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_purchGroup}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/currency" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_currency}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderheader/items" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_items}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/createdAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/createdBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/modifiedAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/modifiedBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/purchase_order_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/po_item" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_poItem}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/material_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/quantity" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_quantity}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/uom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_uom}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/net_price" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_netPrice}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/price_unit" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_priceUnit}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/delivery_completed" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryCompleted}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/delivery_date" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_deliveryDate}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.purchaseorderitems/materials" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_material}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_type" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialType}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/industry_sector" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_industrySector}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/material_group" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialGroup}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/base_uom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_baseUom}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialmaster/texts" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_texts}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/createdAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/createdBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/modifiedAt" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/modifiedBy" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/material_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/language" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_language}"/>
+        <Annotation Term="Validation.AllowedValues">
+          <Collection>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="English"/>
+              <PropertyValue Property="Value" String="EN"/>
+            </Record>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="Arabic"/>
+              <PropertyValue Property="Value" String="AR"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription/material_description" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialDesc}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/locale" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>LanguageCode}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/material_number" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialNum}"/>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/language" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_language}"/>
+        <Annotation Term="Validation.AllowedValues">
+          <Collection>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="English"/>
+              <PropertyValue Property="Value" String="EN"/>
+            </Record>
+            <Record Type="Validation.AllowedValue">
+              <Annotation Term="Core.SymbolicName" String="Arabic"/>
+              <PropertyValue Property="Value" String="AR"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="purchaseServ.materialdescription_texts/material_description" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+        <Annotation Term="Common.Label" String="{i18n>bp_materialDesc}"/>
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
